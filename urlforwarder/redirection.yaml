@@ -1,0 +1,4 @@
+- path: /home
+  url: /home-far-away
+- path: /seed
+  url: /fruit
