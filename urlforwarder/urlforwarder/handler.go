@@ -2,6 +2,7 @@ package urlforwarder
 
 import (
 	"encoding/json"
+	"github.com/tidwall/buntdb"
 	"gopkg.in/yaml.v2"
 	"net/http"
 )
@@ -97,4 +98,28 @@ func parseJSON(jsonData []byte) ([]PathUrl, error) {
 	}
 
 	return p, nil
+}
+
+func DBHandler(db *buntdb.DB, fallback http.Handler) (http.HandlerFunc, error) {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		redirectUrl := ""
+		err := db.View(
+			func(tx *buntdb.Tx) error {
+				url, err := tx.Get(request.URL.Path)
+				if err != nil {
+					return err
+				}
+
+				redirectUrl = url
+				return nil
+			},
+		)
+
+		if err != nil {
+			fallback.ServeHTTP(writer, request)
+		} else {
+			http.Redirect(writer, request, redirectUrl, http.StatusMovedPermanently)
+		}
+
+	}, nil
 }
