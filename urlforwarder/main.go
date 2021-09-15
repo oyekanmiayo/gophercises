@@ -35,14 +35,8 @@ func main() {
 	case ".yaml":
 		handler, _ = urlforwarder.YAMLHandler(content, http.DefaultServeMux)
 	case ".json":
-		handler, _ = urlforwarder.JSOn
-
-
+		handler, _ = urlforwarder.JSONHandler(content, http.DefaultServeMux)
 	}
-	if ext == ".yaml" ||  ext == ".yml"{
-		handler, _ := urlforwarder.YAMLHandler(content, http.DefaultServeMux)
-	}  else if
-
 
 	fmt.Println("Starting the server on :8080")
 	_ = http.ListenAndServe(":8080", handler)
