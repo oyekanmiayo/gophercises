@@ -1,6 +1,7 @@
 package urlforwarder
 
 import (
+	"encoding/json"
 	"gopkg.in/yaml.v2"
 	"net/http"
 )
@@ -76,4 +77,24 @@ func buildMap(pathUrl []PathUrl) map[string]string {
 	}
 
 	return m
+}
+
+/**/
+func JSONHandler(jsonData []byte, fallback http.Handler) (http.HandlerFunc, error) {
+	pathUrl, err := parseJSON(jsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	pathMap := buildMap(pathUrl)
+	return MapHandler(pathMap, fallback), nil
+}
+
+func parseJSON(jsonData []byte) ([]PathUrl, error) {
+	var p []PathUrl
+	if err := json.Unmarshal(jsonData, &p); err != nil {
+		return nil, err
+	}
+
+	return p, nil
 }
